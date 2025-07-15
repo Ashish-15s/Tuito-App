@@ -1,9 +1,11 @@
-package com.Tuito_App.modal;
+package com.Tuito_App.model;
 
-import org.springframework.data.annotation.Id;
 
+
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Student {
 
     @Id

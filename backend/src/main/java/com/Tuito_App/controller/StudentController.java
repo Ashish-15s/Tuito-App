@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Tuito_App.modal.Student;
+import com.Tuito_App.model.Student;
 import com.Tuito_App.service.StudentService;
 
 import jakarta.validation.Valid;
 
+//controller 
 @RestController
 @RequestMapping("/api/students")
 @CrossOrigin("*")
