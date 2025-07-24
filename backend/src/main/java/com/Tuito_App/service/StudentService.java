@@ -42,6 +42,13 @@ public class StudentService {
             return studentRepository.save(existing);
         });
     }
+    
+    public Optional<Student> togglePaidStatus(Long id){
+    	return studentRepository.findById(id).map(existing->{
+    		existing.setPaid(!existing.isPaid());
+    		return studentRepository.save(existing);
+    	} );
+    }
 
     // Delete student
     public boolean deleteStudent(Long id) {

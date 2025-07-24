@@ -8,10 +8,7 @@ function AddStudentForm({ onSubmit }) {
   const [phone, setPhone] = useState('');
 
   const handleSubmit = () => {
-    if (!name.trim() || !standard.trim() || !fee.trim() || !phone.trim()) {
-      Alert.alert('Error', 'All fields are required.');
-      return;
-    }
+
 
     const newStudent = {
       name,
@@ -29,7 +26,7 @@ function AddStudentForm({ onSubmit }) {
     setName('');
     setStandard('');
     setFee('');
-    Alert.alert('Success', 'Student added successfully!');
+
   };
 
   return (

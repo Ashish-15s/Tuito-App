@@ -1,14 +1,103 @@
-import React, { useState } from 'react';
-import { View, Button, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { View, Button, StyleSheet, ScrollView, Alert, ActivityIndicator, Text } from 'react-native';
 import StudentList from '../components/StudentList';
+import axios from 'axios';
+import Toast from 'react-native-toast-message';
+
 
 import FilterBar from '../components/FilterBar';
 
 export default function HomeScreen() {
+
+
+  const [loading, setLoading] = useState(false);
+
+  const API_URL = 'http://192.168.1.14:8080/api/students';
+  const fetchStudents = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(API_URL);
+      setStudents([...response.data]); // force new array
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error fetching students',
+        text2: error.message
+      });
+
+      console.error('Error fetching students:', error.message);
+    }
+    finally {
+      setLoading(false);
+    }
+
+  };
+
+
   const [students, setStudents] = useState([
-    { id: 1, name: 'Aarav Sharma', standard: '7th', fee: '1200', isPaid: true },
-    { id: 2, name: 'Riya Patel', standard: '10th', fee: '1500', isPaid: false },
-  ]);
+  ]
+  );
+
+
+  // Toggle paid
+  const togglePaid = async (id) => {
+    const previousStudents = [...students];
+    const updated = students.map(s =>
+      s.id === id ? { ...s, isPaid: !s.isPaid } : s
+    );
+    setStudents(updated); // instantly update UI
+    try {
+
+      await axios.put(`${API_URL}/${id}/togglePaid`);
+
+      Toast.show({
+        type: 'success', // or 'error', 'info'
+        text1: 'Success',
+        text2: `Payment status changed}`
+      });
+
+    }
+    catch (error) {
+      setStudents(previousStudents);
+      Toast.show({
+        type: 'error',
+        text1: 'Error while updating paid',
+      });
+    }
+  };
+
+
+  //  Delete
+  const deleteStudent = async (id) => {
+    const previousStudents = [...students];
+    setStudents(prev => prev.filter(s => s.id !== id));
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      //console.log("Delete student: ", response.data);
+      Toast.show({
+        type: 'success',
+        text1: 'Student Deleted',
+
+      });
+    }
+    catch (error) {
+      setStudents(previousStudents);
+      Toast.show({
+        type: 'error',
+        text1: 'Error while deleting user',
+
+      });
+
+      console.log("Error while deleting usr:", error.message);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchStudents();
+    }, [])
+  );
 
   const [filter, setFilter] = useState({
     showPaid: false,
@@ -27,18 +116,8 @@ export default function HomeScreen() {
     setStudents(sorted);
   };
 
-  //  Delete
-  const deleteStudent = (id) => {
-    setStudents(prev => prev.filter(s => s.id !== id));
-  };
 
-  // Toggle paid
-  const togglePaid = (id) => {
-    const updated = students.map(s =>
-      s.id === id ? { ...s, isPaid: !s.isPaid } : s
-    );
-    setStudents(updated);
-  };
+
 
   const filteredStudents = students.filter(student => {
     if (student.isPaid && filter.showPaid) return true;
@@ -56,12 +135,15 @@ export default function HomeScreen() {
       <FilterBar filter={filter} setFilter={setFilter} />
 
 
-
-      <StudentList
-        students={filteredStudents}
-        onDelete={deleteStudent}
-        onTogglePaid={togglePaid}
-      />
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        <StudentList
+          students={filteredStudents}
+          onDelete={deleteStudent}
+          onTogglePaid={togglePaid}
+        />
+      )}
 
     </View>
   );

@@ -2,6 +2,8 @@ package com.Tuito_App.model;
 
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,6 +34,7 @@ public class Student {
     @Min(value = 1, message = "Fee must be positive")
     private int fee;
 
+   
     private boolean isPaid = false;
 
     
@@ -77,7 +80,7 @@ public class Student {
 		this.fee = fee;
 	}
 
-
+	 @JsonProperty("isPaid")
 	public boolean isPaid() {
 		return isPaid;
 	}
