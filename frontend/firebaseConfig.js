@@ -7,14 +7,15 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCuPIv5QQ98D7zvWgtz86Or1RGXMF7k0t8",
-    authDomain: "tuito-app-a29e3.firebaseapp.com",
-    projectId: "tuito-app-a29e3",
-    storageBucket: "tuito-app-a29e3.firebasestorage.app",
-    messagingSenderId: "254225366531",
-    appId: "1:254225366531:web:61dfe558c75c476082d836",
-    measurementId: "G-YNPM1PRBZL"
+    apiKey: "AIzaSyXXXXXX-XXXXXX-XXXXXX-XXXXXX",
+    authDomain: "your-app.firebaseapp.com",
+    projectId: "your-app-id",
+    storageBucket: "your-app.appspot.com",
+    messagingSenderId: "123456789000",
+    appId: "1:123456789000:web:xxxxxxxxxxxxxxxxxxxxxx",
+    measurementId: "G-XXXXXXXXXX"
 };
+
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
