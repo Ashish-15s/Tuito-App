@@ -4,6 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PhoneLoginScreen from "../screens/PhoneLoginScreen";
 import OTPVerifyScreen from "../screens/OTPVerifyScreen";
 import HomeScreen from "../screens/HomeScreen";
+import PasswordLoginScreen from "../screens/PasswordLoginScreen";
+import SignupScreen from "../screens/SignupScreen";
 
 const Stack = createNativeStackNavigator();
 export default function AuthNavigator() {
