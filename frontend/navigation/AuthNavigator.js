@@ -6,15 +6,16 @@ import OTPVerifyScreen from "../screens/OTPVerifyScreen";
 import HomeScreen from "../screens/HomeScreen";
 import PasswordLoginScreen from "../screens/PasswordLoginScreen";
 import SignupScreen from "../screens/SignupScreen";
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Stack = createNativeStackNavigator();
 export default function AuthNavigator() {
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="PhoneLogin" component={PhoneLoginScreen} />
-                <Stack.Screen name="OtpVerify" component={OTPVerifyScreen} />
+                {/* <Stack.Screen name="PhoneLogin" component={PhoneLoginScreen} /> */}
                 <Stack.Screen name="PasswordLogin" component={PasswordLoginScreen} options={{ title: 'Password Login' }} />
+                {/* <Stack.Screen name="OtpVerify" component={OTPVerifyScreen} /> */}
                 <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign Up' }} />
             </Stack.Navigator>
         </NavigationContainer>

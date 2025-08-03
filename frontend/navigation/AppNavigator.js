@@ -1,9 +1,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/HomeScreen';
+import { Ionicons } from '@expo/vector-icons';
+
+import HomeStackNavigator from './HomeStackNavigator'; // use this
 import AddStudentScreen from '../screens/AddStudentScreen';
-import { Ionicons } from '@expo/vector-icons'; // icon set
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,9 +17,7 @@ export default function AppNavigator() {
           tabBarStyle: { backgroundColor: '#f0f0f0' },
           tabBarActiveTintColor: '#333',
           tabBarInactiveTintColor: '#888',
-          headerStyle: { backgroundColor: '#f0f0f0' },
-          headerTintColor: '#333',
-          contentStyle: { backgroundColor: '#ffffff' },
+          headerShown: false,
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
@@ -25,15 +25,17 @@ export default function AppNavigator() {
               iconName = 'home-outline';
             } else if (route.name === 'Add Student') {
               iconName = 'person-add-outline';
+            } else if (route.name === 'Profile') {
+              iconName = 'person-circle-outline';
             }
 
             return <Ionicons name={iconName} size={size} color={color} />;
           },
         })}
       >
-
-        <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Home" component={HomeStackNavigator} />
         <Tab.Screen name="Add Student" component={AddStudentScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </NavigationContainer>
   );

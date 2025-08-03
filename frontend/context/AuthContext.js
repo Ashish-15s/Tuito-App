@@ -1,6 +1,7 @@
 // contexts/AuthContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export const AuthContext = createContext();
 
@@ -11,8 +12,21 @@ export default function AuthProvider({ children }) {
     useEffect(() => {
         const checkToken = async () => {
             const token = await AsyncStorage.getItem('token');
-            setUserToken(token);
-            setIsLoading(false);
+            try {
+                const response = await axios.get('http://192.168.1.14:8080/api/auth/ping', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                setUserToken(token);
+
+            } catch (error) {
+
+                console.log("Token validation failed:", error.message);
+                await AsyncStorage.removeItem('token');
+            }
+            setIsLoading(false)
         };
         checkToken();
     }, []);

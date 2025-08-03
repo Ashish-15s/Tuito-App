@@ -1,26 +1,16 @@
 // App.js
-import React, { useEffect, useState } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebaseConfig';
+import React, { useContext } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+
 import AuthNavigator from './navigation/AuthNavigator';
 import AppNavigator from './navigation/AppNavigator';
-import Toast from 'react-native-toast-message';
-import { ActivityIndicator, View } from 'react-native';
+import AuthProvider, { AuthContext } from './context/AuthContext';
 
-export default function App() {
-  const [user, setUser] = useState(null);
-  const [checkingAuth, setCheckingAuth] = useState(true);
+function Main() {
+  const { userToken, isLoading } = useContext(AuthContext);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
-      setCheckingAuth(false);
-    });
-
-    return unsubscribe;
-  }, []);
-
-  if (checkingAuth) {
+  if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -30,8 +20,16 @@ export default function App() {
 
   return (
     <>
-      {user ? <AppNavigator /> : <AuthNavigator />}
+      {userToken ? <AppNavigator /> : <AuthNavigator />}
       <Toast />
     </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <Main />
+    </AuthProvider>
   );
 }

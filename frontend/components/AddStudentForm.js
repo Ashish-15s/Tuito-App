@@ -1,32 +1,74 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 
-function AddStudentForm({ onSubmit }) {
-  const [name, setName] = useState('');
-  const [standard, setStandard] = useState('');
-  const [fee, setFee] = useState('');
-  const [phone, setPhone] = useState('');
+function AddStudentForm({ onSubmit, initialData = {}, isEdit = false }) {
+  const [name, setName] = useState(initialData.name || '');
+  const [standard, setStandard] = useState(initialData.standard || '');
+  const [fee, setFee] = useState(
+    initialData.fee != null ? initialData.fee.toString() : ''
+  );
+  const [dueFee, setDueFee] = useState(
+    initialData.dueFee != null ? initialData.dueFee.toString() : ''
+  );
+  const [phone, setPhone] = useState(initialData.phone || '');
+  const [dueDate, setDueDate] = useState(
+    initialData.dueDate != null ? initialData.dueDate.toString() : ''
+  );
 
   const handleSubmit = () => {
+    if (!name || !standard || !fee || !phone || !dueDate) {
+      Alert.alert("Missing Fields", "Please fill out all required fields.");
+      return;
+    }
 
+    if (isNaN(fee) || parseFloat(fee) <= 0) {
+      Alert.alert("Invalid Fee", "Please enter a valid monthly fee amount.");
+      return;
+    }
+
+    if (isEdit && (isNaN(dueFee) || parseFloat(dueFee) < 0)) {
+      Alert.alert("Invalid Due Fee", "Due fee should be a valid number (0 or more).");
+      return;
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+      Alert.alert("Invalid Phone", "Phone number should be exactly 10 digits.");
+      return;
+    }
+    if (isNaN(dueDate) || dueDate < 1 || dueDate > 31) {
+      Alert.alert("Invalid Date", "Please enter a day between 1 and 31.");
+      return;
+    }
 
     const newStudent = {
       name,
       standard,
       fee,
-      isPaid: false, // default when new student is added
       phone,
+      dueDate,
     };
+
+    // If editing, include the ID
+    if (isEdit && initialData.id) {
+      newStudent.id = initialData.id;
+      newStudent.dueFee = dueFee;
+    } else {
+      newStudent.isPaid = false; // default for new students
+    }
+    console.log(newStudent)
 
     if (onSubmit) {
       onSubmit(newStudent);
     }
 
-    // Reset form
-    setName('');
-    setStandard('');
-    setFee('');
-
+    // Reset only if adding
+    if (!isEdit) {
+      setName('');
+      setStandard('');
+      setFee('');
+      setPhone('');
+      setDueDate('');
+    }
   };
 
   return (
@@ -56,7 +98,20 @@ function AddStudentForm({ onSubmit }) {
         keyboardType="numeric"
       />
 
-      <Text style={styles.label}>Phone No (₹)</Text>
+      {isEdit && (
+        <>
+          <Text style={styles.label}>Due Fee (₹)</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Due fee"
+            value={dueFee}
+            onChangeText={setDueFee}
+            keyboardType="numeric"
+          />
+        </>
+      )}
+
+      <Text style={styles.label}>Phone No</Text>
       <TextInput
         style={styles.input}
         placeholder="Phone No"
@@ -65,14 +120,27 @@ function AddStudentForm({ onSubmit }) {
         keyboardType="numeric"
       />
 
+      <Text style={styles.label}>Fee Due Day</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Fee Day"
+        value={dueDate}
+        onChangeText={setDueDate}
+        keyboardType="numeric"
+      />
+
       <View style={styles.buttonContainer}>
-        <Button title="Add Student" onPress={handleSubmit} />
+        <Button
+          title={isEdit ? "Update Student" : "Add Student"}
+          onPress={handleSubmit}
+        />
       </View>
     </View>
   );
 }
 
 export default AddStudentForm;
+
 const styles = StyleSheet.create({
   form: {
     padding: 16,
@@ -97,4 +165,3 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
-

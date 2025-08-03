@@ -1,18 +1,39 @@
 // screens/PasswordLoginScreen.js
 
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import Toast from 'react-native-toast-message';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContext } from '../context/AuthContext';
+
+
 
 export default function PasswordLoginScreen({ navigation }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const { login } = useContext(AuthContext);
+
 
     const handlePasswordLogin = async () => {
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const API_URL = 'http://192.168.1.14:8080/api/auth/login';
+
+            user = {
+                email,
+                password
+            }
+
+            const response = await axios.post(API_URL, user);
+            const jwtToken = response.data;
+
+            await AsyncStorage.setItem('token', jwtToken);
+            await AsyncStorage.setItem('userEmail', email);
+            await login(jwtToken);
+
+
             Toast.show({ type: 'success', text1: 'Login Successful' });
         } catch (error) {
             Toast.show({ type: 'error', text1: 'Login Failed', text2: error.message });
@@ -41,9 +62,9 @@ export default function PasswordLoginScreen({ navigation }) {
 
             <Button title="Login" onPress={handlePasswordLogin} />
 
-            <TouchableOpacity onPress={() => navigation.navigate('OtpLogin')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('OtpLogin')}>
                 <Text style={styles.link}>Login with OTP</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
                 <Text style={styles.link}>Don't have an account? Sign up</Text>

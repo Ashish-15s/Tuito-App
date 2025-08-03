@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
 import StudentCard from './StudentCard';
 
-export default function StudentList({ students, onDelete, onTogglePaid }) {
+export default function StudentList({ students, onDelete, onTogglePaid, onEdit }) {
   if (!students || students.length === 0) {
     return (
       <View style={styles.emptyContainer}>
@@ -20,11 +20,15 @@ export default function StudentList({ students, onDelete, onTogglePaid }) {
           key={item.id}
           name={item.name}
           standard={item.standard}
-          fee={item.fee}
+          dueFee={item.dueFee}
           isPaid={item.isPaid}
+          fee={item.fee}
+          phone={item.phone} // ✅ Add this line
           onDelete={() => onDelete(item.id)}
           onTogglePaid={() => onTogglePaid(item.id)}
+          onEdit={() => onEdit(item)}
         />
+
       )}
       contentContainerStyle={styles.listContainer}
     />
