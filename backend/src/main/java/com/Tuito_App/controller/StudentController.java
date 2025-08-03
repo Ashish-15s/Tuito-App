@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -48,6 +49,7 @@ public class StudentController {
     // Get all students
     @GetMapping
     public ResponseEntity<List<Student>> getAllStudents() {
+    	String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
@@ -72,5 +74,16 @@ public class StudentController {
         Optional<Student> updated = studentService.togglePaidStatus(id);
         return updated.map(ResponseEntity::ok)
                       .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateStudent(@PathVariable Long id, @RequestBody Student updatedStudent) {
+        Optional<Student> result = studentService.updateStudent(id, updatedStudent);
+
+        if (result.isPresent()) {
+            return ResponseEntity.ok(result.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
