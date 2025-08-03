@@ -1,13 +1,11 @@
 // screens/SignupScreen.js
 
 import axios from 'axios';
-import React, { useContext, useState } from 'react';
-import { View, TextInput, Button, Text, StyleSheet, TouchableOpacity } from 'react-native';;
+import React, { useState } from 'react';
+import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Toast from 'react-native-toast-message';
-import { AuthContext } from '../context/AuthContext';
 
 export default function SignupScreen({ navigation }) {
-
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [userName, setName] = useState('');
@@ -30,12 +28,9 @@ export default function SignupScreen({ navigation }) {
             Toast.show({ type: 'error', text1: 'Password must be at least 6 characters' });
             return;
         }
+
         try {
-            user = {
-                email,
-                password,
-                userName
-            }
+            const user = { email, password, userName };
             await axios.post(API_URL, user);
             Toast.show({ type: 'success', text1: 'Account Created' });
             navigation.navigate('PasswordLogin');
@@ -46,10 +41,11 @@ export default function SignupScreen({ navigation }) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Sign Up</Text>
+            <Text style={styles.title}>Create Account</Text>
+
             <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder="Your Email"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -58,26 +54,23 @@ export default function SignupScreen({ navigation }) {
 
             <TextInput
                 style={styles.input}
-                placeholder="Name"
+                placeholder="Full Name"
                 value={userName}
                 onChangeText={setName}
-                // keyboardType="email-address"
-                autoCapitalize="none"
+                autoCapitalize="words"
             />
 
             <TextInput
                 style={styles.input}
-                placeholder="Password (min 6 chars)"
+                placeholder="Password (min 6 characters)"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
             />
 
-            <Button title="Sign Up" onPress={handleSignup} />
-
-            {/* <TouchableOpacity onPress={() => navigation.navigate('OtpLogin')}>
-                <Text style={styles.link}>Login with OTP</Text>
-            </TouchableOpacity> */}
+            <TouchableOpacity style={styles.button} onPress={handleSignup}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+            </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('PasswordLogin')}>
                 <Text style={styles.link}>Already have an account? Login</Text>
@@ -87,8 +80,45 @@ export default function SignupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { padding: 20, flex: 1, justifyContent: 'center' },
-    title: { fontSize: 22, marginBottom: 20, textAlign: 'center' },
-    input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, marginBottom: 10, padding: 10 },
-    link: { color: 'blue', marginTop: 10, textAlign: 'center' }
+    container: {
+        padding: 24,
+        flex: 1,
+        justifyContent: 'center',
+        backgroundColor: '#fefefe',
+    },
+    title: {
+        fontSize: 26,
+        fontWeight: '600',
+        marginBottom: 24,
+        textAlign: 'center',
+        color: '#333',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#aaa',
+        borderRadius: 8,
+        marginBottom: 14,
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        fontSize: 16,
+        backgroundColor: '#fff',
+    },
+    button: {
+        backgroundColor: '#1e90ff',
+        paddingVertical: 12,
+        borderRadius: 8,
+        marginTop: 8,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: '600',
+        fontSize: 16,
+    },
+    link: {
+        color: '#1e90ff',
+        marginTop: 20,
+        textAlign: 'center',
+        fontSize: 14,
+    },
 });

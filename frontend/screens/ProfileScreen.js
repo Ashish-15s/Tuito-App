@@ -1,27 +1,36 @@
-// screens/ProfileScreen.js
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Alert,
+    SafeAreaView,
+    Platform,
+    TouchableOpacity,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 import { AuthContext } from '../context/AuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-export default function ProfileScreen({ navigation }) {
-    const { userToken, logout } = useContext(AuthContext);
-
+export default function ProfileScreen() {
+    const { logout } = useContext(AuthContext);
     const [userInfo, setUserInfo] = useState('');
 
     useEffect(() => {
         getUserInfo();
     }, []);
 
-
     const getUserInfo = async () => {
-        const info = await AsyncStorage.getItem('userEmail');
-        setUserInfo(info);
-        console.log(userInfo);
-    }
-
+        try {
+            const info = await AsyncStorage.getItem('userEmail');
+            if (info) setUserInfo(info);
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error loading user info',
+            });
+        }
+    };
 
     const handleLogout = () => {
         Alert.alert('Logout', 'Are you sure you want to log out?', [
@@ -31,13 +40,8 @@ export default function ProfileScreen({ navigation }) {
                 style: 'destructive',
                 onPress: async () => {
                     try {
-                        await logout(); // clears token
-                        Toast.show({ type: 'success', text1: 'Logged out' });
-                        // navigation reset if needed:
-                        // navigation.reset({
-                        //     index: 0,
-                        //     routes: [{ name: 'Home' }], // adjust name to your auth entry screen
-                        // });
+                        await logout();
+                        Toast.show({ type: 'success', text1: 'Logged out successfully' });
                     } catch (err) {
                         Toast.show({ type: 'error', text1: 'Logout failed' });
                     }
@@ -47,52 +51,86 @@ export default function ProfileScreen({ navigation }) {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.header}>Profile</Text>
-            {userInfo ? (
-                <>
-                    <Text style={styles.label}>Email:</Text>
-                    <Text style={styles.value}>{userInfo}</Text>
+        <SafeAreaView style={styles.safeArea}>
+            <View style={styles.container}>
+                <Text style={styles.header}>👤 Profile</Text>
 
-                </>
-            ) : (
-                <Text style={styles.info}>No user info available.</Text>
-            )}
-            <View style={styles.logoutButton}>
-                <Button title="Logout" onPress={handleLogout} color="#d9534f" />
+                {userInfo ? (
+                    <>
+                        <View style={styles.infoBox}>
+                            <Text style={styles.label}>Email</Text>
+                            <Text style={styles.value}>{userInfo}</Text>
+                        </View>
+                    </>
+                ) : (
+                    <Text style={styles.info}>No user info available.</Text>
+                )}
+
+                <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+                    <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
             </View>
-        </View>
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+        backgroundColor: '#f8f9fa',
+        paddingTop: Platform.OS === 'android' ? 24 : 0,
+    },
     container: {
         flex: 1,
-        padding: 24,
-        backgroundColor: '#fff',
-        justifyContent: 'flex-start',
+        padding: 20,
     },
     header: {
-        fontSize: 28,
+        fontSize: 26,
         fontWeight: '700',
-        marginBottom: 16,
+        color: '#222',
+        marginBottom: 30,
+    },
+    infoBox: {
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOpacity: 0.05,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 8,
+        elevation: 3,
     },
     label: {
         fontSize: 14,
-        marginTop: 8,
-        fontWeight: '600',
-        color: '#555',
+        color: '#888',
+        marginBottom: 4,
     },
     value: {
         fontSize: 16,
-        marginBottom: 4,
+        fontWeight: '500',
+        color: '#333',
     },
     info: {
         fontSize: 16,
-        marginVertical: 12,
         color: '#666',
+        marginVertical: 20,
     },
-    logoutButton: {
+    logoutBtn: {
         marginTop: 40,
+        alignSelf: 'center',
+        backgroundColor: '#e53935',
+        paddingVertical: 10,
+        paddingHorizontal: 32,
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 6,
+        elevation: 2,
+    },
+    logoutText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });

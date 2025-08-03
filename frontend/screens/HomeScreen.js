@@ -6,12 +6,16 @@ import {
   StyleSheet,
   ActivityIndicator,
   TextInput,
+  TouchableOpacity,
+  Text,
+  FlatList
 } from 'react-native';
 import StudentList from '../components/StudentList';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FilterBar from '../components/FilterBar';
+import { Ionicons } from '@expo/vector-icons'; // For FAB icon
 
 export default function HomeScreen() {
   const [loading, setLoading] = useState(false);
@@ -46,7 +50,6 @@ export default function HomeScreen() {
         text1: 'Error fetching students',
         text2: error.message,
       });
-      console.error('Error fetching students:', error.message);
     } finally {
       setLoading(false);
     }
@@ -65,17 +68,10 @@ export default function HomeScreen() {
           Authorization: `Bearer ${token}`,
         },
       });
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: `Payment status changed`,
-      });
+      Toast.show({ type: 'success', text1: 'Payment status changed' });
     } catch (error) {
       setStudents(previousStudents);
-      Toast.show({
-        type: 'error',
-        text1: 'Error while updating paid',
-      });
+      Toast.show({ type: 'error', text1: 'Error while updating paid' });
     }
   };
 
@@ -84,25 +80,18 @@ export default function HomeScreen() {
     setStudents((prev) => prev.filter((s) => s.id !== id));
     try {
       await axios.delete(`${API_URL}/${id}`);
-      Toast.show({
-        type: 'success',
-        text1: 'Student Deleted',
-      });
+      Toast.show({ type: 'success', text1: 'Student Deleted' });
     } catch (error) {
       setStudents(previousStudents);
-      Toast.show({
-        type: 'error',
-        text1: 'Error while deleting user',
-      });
+      Toast.show({ type: 'error', text1: 'Error while deleting user' });
     }
   };
 
-  // Debounce logic: wait 300ms after typing stops
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery);
     }, 300);
-    return () => clearTimeout(timer); // cancel on re-type
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
   useFocusEffect(
@@ -125,7 +114,6 @@ export default function HomeScreen() {
     setStudents(sorted);
   };
 
-  // Filter + Search
   const filteredStudents = students.filter((student) => {
     const matchesPayment =
       (student.isPaid && filter.showPaid) ||
@@ -138,22 +126,28 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.heading}>Student Fee Tracker</Text>
+
       <TextInput
         style={styles.searchInput}
-        placeholder="Search by name..."
+        placeholder="🔍 Search by name..."
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
 
       <View style={styles.buttonRow}>
-        <Button title="Sort by Name" onPress={sortByName} />
-        <Button title="Sort by Standard" onPress={sortByStandard} />
+        <TouchableOpacity style={styles.sortButton} onPress={sortByName}>
+          <Text style={styles.sortText}>Sort by Name</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.sortButton} onPress={sortByStandard}>
+          <Text style={styles.sortText}>Sort by Class</Text>
+        </TouchableOpacity>
       </View>
 
       <FilterBar filter={filter} setFilter={setFilter} />
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#4B7BE5" />
       ) : (
         <StudentList
           students={filteredStudents}
@@ -162,6 +156,13 @@ export default function HomeScreen() {
           onEdit={handleEditStudent}
         />
       )}
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => navigation.navigate('Add Student')}
+      >
+        <Ionicons name="add" size={28} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -169,20 +170,53 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#F7F9FC',
     padding: 16,
   },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2D2D2D',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
   searchInput: {
-    height: 40,
-    borderColor: '#ccc',
+    height: 45,
+    borderColor: '#ddd',
     borderWidth: 1,
+    backgroundColor: '#fff',
+    paddingHorizontal: 14,
+    borderRadius: 12,
     marginBottom: 12,
-    paddingHorizontal: 10,
-    borderRadius: 8,
   },
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 10,
+  },
+  sortButton: {
+    backgroundColor: '#4B7BE5',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+  },
+  sortText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    backgroundColor: '#F5A623',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 6,
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
   },
 });
